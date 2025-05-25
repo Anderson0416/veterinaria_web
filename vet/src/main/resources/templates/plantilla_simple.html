@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Consulta Veterinaria</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+            padding: 0;
+        }
+        h1 {
+            font-size: 18px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 5px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Consulta Veterinaria - Agenda Peluda</h1>
+    
+    <h2>Información Básica</h2>
+    <table>
+        <tr>
+            <td>ID Mascota:</td>
+            <td th:text="${ID_MASCOTA}">ID</td>
+        </tr>
+        <tr>
+            <td>Nombre Mascota:</td>
+            <td th:text="${NOMBRE_MASCOTA}">Nombre</td>
+        </tr>
+        <tr>
+            <td>Peso:</td>
+            <td th:text="${PESO1}">Peso</td>
+        </tr>
+        <tr>
+            <td>Motivo de Consulta:</td>
+            <td th:text="${MOTIVO_CONSULTA}">Motivo</td>
+        </tr>
+    </table>
+    
+    <p>Este es un documento de prueba para verificar la generación de PDF.</p>
+    
+    <p>Fecha de generación: <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}">Fecha</span></p>
+</body>
+</html>

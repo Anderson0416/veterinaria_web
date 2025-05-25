@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <!-- Link a Google Fonts para Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+            padding: 0;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        h1 {
+            font-size: 18px;
+            text-transform: uppercase;
+            font-weight: 600; /* Negrita para Montserrat */
+        }
+
+        h2 {
+            text-align: left;
+            font-size: 14px;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #000;
+            text-align: left;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+        }
+
+        .header-info {
+            text-align: right;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            margin-top: 20px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabecera -->
+    <div class="header">
+        <h1>Consulta Veterinaria Agenda Peluda</h1>
+        <div class="header-info">
+            <p>Dirección: Av. las Águilas 123</p>
+            <p>Teléfono: 567-546-55</p>
+        </div>
+    </div>
+
+    <!-- Información de la Mascota -->
+    <div class="section">
+        <h2>Informacion de la Mascota</h2>
+        <table>
+            <tr>
+                <td><strong>ID Mascota:</strong></td>
+                <td th:text="${ID_MASCOTA}">ID</td>
+            </tr>
+            <tr>
+                <td><strong>Nombre Mascota:</strong></td>
+                <td th:text="${NOMBRE_MASCOTA}">Nombre</td>
+            </tr>
+            <tr>
+                <td><strong>Vacunas Previas:</strong></td>
+                <td th:text="${VACUNAS_PREVIAS}">Vacunas</td>
+            </tr>
+            <tr>
+                <td><strong>Vacunas y Desparacitación:</strong></td>
+                <td th:text="${VACUNAS_DESPARASITACION}">Desparasitación</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Información Adicional -->
+    <div class="section">
+        <h2>Informacion Adicional</h2>
+        <table>
+            <tr>
+                <td><strong>Actividad Fisica:</strong></td>
+                <td th:text="${ACTIVIDAD_FISICA}">Actividad</td>
+            </tr>
+            <tr>
+                <td><strong>Estado Reproductivo:</strong></td>
+                <td th:text="${ESTADO_REPRODUCTIVO}">Estado</td>
+            </tr>
+            <tr>
+                <td><strong>Tipo de Vivienda:</strong></td>
+                <td th:text="${TIPO_VIVIENDA}">Vivienda</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Datos de la Consulta -->
+    <div class="section">
+        <h2>Datos de la Consulta</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Peso</th>
+                    <th>Motivo de Consulta</th>
+                    <th>Sintomas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td th:text="${PESO1}">Peso</td>
+                    <td th:text="${MOTIVO_CONSULTA}">Motivo</td>
+                    <td th:text="${SINTOMAS}">Síntomas</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="section">
+        <h2>Observaciones Adicionales</h2>
+        <p th:text="${OBSERVACIONES}">Observaciones</p>
+    </div>
+
+    <!-- Dieta y Alimentación -->
+    <div class="section">
+        <h2>Dieta y Alimentacion</h2>
+        <p th:text="${DIETA}">Dieta</p>
+    </div>
+
+    <!-- Pie de Página -->
+    <div class="footer">
+        <p>&copy; 2024 Clinica Veterinaria Agenda Peluda - Todos los derechos reservados</p>
+    </div>
+</body>
+</html>
