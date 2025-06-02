@@ -16,7 +16,7 @@ export function RegisterUserForm() {
         telefono: '',
         fechaContrato: '',
         login: '',
-        rol: '' 
+        rol: ''
     });
     const [errors, setErrors] = useState({});
     const [loginError, setLoginError] = useState('');
@@ -28,38 +28,46 @@ export function RegisterUserForm() {
         return re.test(String(email).toLowerCase());
     };
 
-    const validateForm = (type) => {
-        const newErrors = {};
+    const validateStepFields = () => {
+        const stepErrors = {};
 
-        if (type === 'register') {
-            // ID validation (only numbers)
-            if (!/^\d+$/.test(formData.id)) {
-                newErrors.id = 'El ID debe contener solo números';
-            }
+        if (currentStep === 1) {
+            if (!formData.id.trim()) stepErrors.id = 'El campo ID es obligatorio';
+            else if (!/^\d+$/.test(formData.id)) stepErrors.id = 'El ID debe contener solo números';
 
-            // Name validation (only letters)
-            if (!/^[A-Za-zÁ-ÿ\s]+$/.test(formData.nombre)) {
-                newErrors.nombre = 'El nombre debe contener solo letras';
-            }
+            if (!formData.tipoIdentificacion.trim()) stepErrors.tipoIdentificacion = 'Seleccione un tipo de identificación';
+            if (!formData.nombre.trim()) stepErrors.nombre = 'El nombre es obligatorio';
+            else if (!/^[A-Za-zÁ-ÿ\s]+$/.test(formData.nombre)) stepErrors.nombre = 'El nombre debe contener solo letras';
 
-            // Lastname validation (only letters)
-            if (!/^[A-Za-zÁ-ÿ\s]+$/.test(formData.apellido)) {
-                newErrors.apellido = 'El apellido debe contener solo letras';
-            }
+            if (!formData.apellido.trim()) stepErrors.apellido = 'El apellido es obligatorio';
+            else if (!/^[A-Za-zÁ-ÿ\s]+$/.test(formData.apellido)) stepErrors.apellido = 'El apellido debe contener solo letras';
 
-            // Phone validation (only numbers)
-            if (!/^\d+$/.test(formData.telefono)) {
-                newErrors.telefono = 'El teléfono debe contener solo números';
-            }
+            if (!formData.sexo.trim()) stepErrors.sexo = 'Seleccione un sexo';
         }
 
-        // Email validation
-        if (!validateEmail(formData.login)) {
-            newErrors.login = 'Ingrese un correo electrónico válido';
+        if (currentStep === 2) {
+            if (!formData.fechaNacimiento.trim()) stepErrors.fechaNacimiento = 'Seleccione la fecha de nacimiento';
+            if (!formData.telefono.trim()) stepErrors.telefono = 'El teléfono es obligatorio';
+            else if (!/^\d+$/.test(formData.telefono)) stepErrors.telefono = 'El teléfono debe contener solo números';
+
+            if (!formData.login.trim()) stepErrors.login = 'El correo es obligatorio';
+            else if (!validateEmail(formData.login)) stepErrors.login = 'Ingrese un correo electrónico válido';
         }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        if (currentStep === 3) {
+            if (!formData.rol.trim()) stepErrors.rol = 'Seleccione un rol';
+            if (!formData.fechaContrato.trim()) stepErrors.fechaContrato = 'Seleccione la fecha de contrato';
+        }
+
+        setErrors(stepErrors);
+
+        if (Object.keys(stepErrors).length > 0) {
+            const firstError = Object.values(stepErrors)[0];
+            window.alert(firstError); // Mostrar primer error como ventana emergente
+            return false;
+        }
+
+        return true;
     };
 
     const onChangeHandler = (event) => {
@@ -68,16 +76,14 @@ export function RegisterUserForm() {
             ...prev,
             [name]: value
         }));
-        
-        // Clear specific error when user starts typing
+
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
                 [name]: ''
             }));
         }
-        
-        // Clear login error
+
         if (loginError) {
             setLoginError('');
         }
@@ -85,27 +91,28 @@ export function RegisterUserForm() {
 
     const onSubmitRegister = async (e) => {
         e.preventDefault();
-        if (validateForm('register')) {
+        if (validateStepFields()) {
             await SubmitRegister(
-                formData.id, 
+                formData.id,
                 formData.tipoIdentificacion,
-                formData.nombre, 
+                formData.nombre,
                 formData.apellido,
                 formData.sexo,
                 formData.fechaNacimiento,
                 formData.telefono,
                 formData.fechaContrato,
-                formData.login, 
-                parseInt(formData.rol),                
+                formData.login,
+                parseInt(formData.rol),
                 navigate
             );
-           
             console.log('Formulario enviado:', formData);
         }
     };
 
     const nextStep = () => {
-        setCurrentStep(currentStep + 1);
+        if (validateStepFields()) {
+            setCurrentStep(currentStep + 1);
+        }
     };
 
     const prevStep = () => {
@@ -118,240 +125,182 @@ export function RegisterUserForm() {
                 return (
                     <div className="step-container">
                         <h3 className="step-title">Información Personal</h3>
+                        {/* ID */}
                         <div className="form-group">
                             <label htmlFor="id">N. Identificación</label>
-                            <div className="input-wrapper">
-                                <input 
-                                    type="text" 
-                                    id="id" 
-                                    name="id" 
-                                    className={`form-control ${errors.id ? 'is-invalid' : ''}`}
-                                    value={formData.id}
-                                    onChange={onChangeHandler} 
-                                    placeholder="Ingrese su número de identificación"
-                                />
-                                {errors.id && (
-                                    <div className="invalid-feedback">
-                                        {errors.id}
-                                    </div>
-                                )}
-                            </div>
+                            <input
+                                type="text"
+                                id="id"
+                                name="id"
+                                className={`form-control ${errors.id ? 'is-invalid' : ''}`}
+                                value={formData.id}
+                                onChange={onChangeHandler}
+                                placeholder="Ingrese su número de identificación"
+                            />
                         </div>
 
+                        {/* Tipo de ID */}
                         <div className="form-group">
                             <label htmlFor="tipoIdentificacion">Tipo de Identificación</label>
-                            <div className="select-wrapper">
-                                <select
-                                    id="tipoIdentificacion"
-                                    name="tipoIdentificacion"
-                                    className="form-control"
-                                    value={formData.tipoIdentificacion}
-                                    onChange={onChangeHandler}
-                                >   
-                                    <option value="">Seleccione una opción</option>
-                                    <option value="Cedula de ciudadania">Cédula de ciudadanía</option>
-                                    <option value="Cedula de extranjeria">Cédula de extranjería</option>
-                                    <option value="Pasaporte">Pasaporte</option>
-                                </select>
-                            </div>
+                            <select
+                                id="tipoIdentificacion"
+                                name="tipoIdentificacion"
+                                className="form-control"
+                                value={formData.tipoIdentificacion}
+                                onChange={onChangeHandler}
+                            >
+                                <option value="">Seleccione una opción</option>
+                                <option value="Cedula de ciudadania">Cédula de ciudadanía</option>
+                                <option value="Cedula de extranjeria">Cédula de extranjería</option>
+                                <option value="Pasaporte">Pasaporte</option>
+                            </select>
                         </div>
 
+                        {/* Nombre */}
                         <div className="form-group">
                             <label htmlFor="nombre">Nombre</label>
-                            <div className="input-wrapper">
-                                <input 
-                                    type="text" 
-                                    id="nombre" 
-                                    name="nombre" 
-                                    className={`form-control ${errors.nombre ? 'is-invalid' : ''}`}
-                                    value={formData.nombre}
-                                    onChange={onChangeHandler} 
-                                    placeholder="Ingrese su nombre"
-                                />
-                                {errors.nombre && (
-                                    <div className="invalid-feedback">
-                                        {errors.nombre}
-                                    </div>
-                                )}
-                            </div>
+                            <input
+                                type="text"
+                                id="nombre"
+                                name="nombre"
+                                className={`form-control ${errors.nombre ? 'is-invalid' : ''}`}
+                                value={formData.nombre}
+                                onChange={onChangeHandler}
+                                placeholder="Ingrese su nombre"
+                            />
                         </div>
 
+                        {/* Apellido */}
                         <div className="form-group">
                             <label htmlFor="apellido">Apellido</label>
-                            <div className="input-wrapper">
-                                <input 
-                                    type="text" 
-                                    id="apellido" 
-                                    name="apellido" 
-                                    className={`form-control ${errors.apellido ? 'is-invalid' : ''}`}
-                                    value={formData.apellido}
-                                    onChange={onChangeHandler} 
-                                    placeholder="Ingrese su apellido"
-                                />
-                                {errors.apellido && (
-                                    <div className="invalid-feedback">
-                                        {errors.apellido}
-                                    </div>
-                                )}
-                            </div>
+                            <input
+                                type="text"
+                                id="apellido"
+                                name="apellido"
+                                className={`form-control ${errors.apellido ? 'is-invalid' : ''}`}
+                                value={formData.apellido}
+                                onChange={onChangeHandler}
+                                placeholder="Ingrese su apellido"
+                            />
                         </div>
 
+                        {/* Sexo */}
                         <div className="form-group">
                             <label htmlFor="sexo">Sexo</label>
-                            <div className="select-wrapper">
-                                <select
-                                    id="sexo"
-                                    name="sexo"
-                                    className="form-control"
-                                    value={formData.sexo}
-                                    onChange={onChangeHandler}
-                                >
-                                    <option value="">Seleccione una opción</option>
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                    <option value="Otro">Otro</option>
-                                </select>
-                            </div>
+                            <select
+                                id="sexo"
+                                name="sexo"
+                                className="form-control"
+                                value={formData.sexo}
+                                onChange={onChangeHandler}
+                            >
+                                <option value="">Seleccione una opción</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                                <option value="Otro">Otro</option>
+                            </select>
                         </div>
 
                         <div className="form-footer">
                             <button type="button" className="btn btn-next" onClick={nextStep}>
-                                Siguiente
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                                </svg>
+                                Siguiente →
                             </button>
                         </div>
                     </div>
                 );
-            
+
             case 2:
                 return (
                     <div className="step-container">
                         <h3 className="step-title">Información de Contacto</h3>
+                        {/* Fecha Nacimiento */}
                         <div className="form-group">
                             <label htmlFor="fechaNacimiento">Fecha de Nacimiento</label>
-                            <div className="input-wrapper date-input">
-                                <input 
-                                    type="date" 
-                                    id="fechaNacimiento" 
-                                    name="fechaNacimiento" 
-                                    className="form-control"
-                                    value={formData.fechaNacimiento}
-                                    onChange={onChangeHandler} 
-                                />
-                            </div>
+                            <input
+                                type="date"
+                                id="fechaNacimiento"
+                                name="fechaNacimiento"
+                                className="form-control"
+                                value={formData.fechaNacimiento}
+                                onChange={onChangeHandler}
+                            />
                         </div>
 
+                        {/* Teléfono */}
                         <div className="form-group">
                             <label htmlFor="telefono">Teléfono</label>
-                            <div className="input-wrapper">
-                                <input 
-                                    type="text" 
-                                    id="telefono" 
-                                    name="telefono" 
-                                    className={`form-control ${errors.telefono ? 'is-invalid' : ''}`}
-                                    value={formData.telefono}
-                                    onChange={onChangeHandler} 
-                                    placeholder="Ingrese su teléfono"
-                                />
-                                {errors.telefono && (
-                                    <div className="invalid-feedback">
-                                        {errors.telefono}
-                                    </div>
-                                )}
-                            </div>
+                            <input
+                                type="text"
+                                id="telefono"
+                                name="telefono"
+                                className={`form-control ${errors.telefono ? 'is-invalid' : ''}`}
+                                value={formData.telefono}
+                                onChange={onChangeHandler}
+                                placeholder="Ingrese su teléfono"
+                            />
                         </div>
 
+                        {/* Email */}
                         <div className="form-group">
                             <label htmlFor="login">Correo electrónico</label>
-                            <div className="input-wrapper">
-                                <input 
-                                    type="text" 
-                                    id="login" 
-                                    name="login" 
-                                    className={`form-control ${errors.login ? 'is-invalid' : ''}`}
-                                    value={formData.login}
-                                    onChange={onChangeHandler} 
-                                    placeholder="ejemplo@correo.com"
-                                />
-                                {errors.login && (
-                                    <div className="invalid-feedback">
-                                        {errors.login}
-                                    </div>
-                                )}
-                            </div>
+                            <input
+                                type="text"
+                                id="login"
+                                name="login"
+                                className={`form-control ${errors.login ? 'is-invalid' : ''}`}
+                                value={formData.login}
+                                onChange={onChangeHandler}
+                                placeholder="ejemplo@correo.com"
+                            />
                         </div>
 
                         <div className="button-group">
-                            <button type="button" className="btn btn-prev" onClick={prevStep}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                                </svg>
-                                Anterior
-                            </button>
-                            <button type="button" className="btn btn-next" onClick={nextStep}>
-                                Siguiente
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                                </svg>
-                            </button>
+                            <button type="button" className="btn btn-prev" onClick={prevStep}>← Anterior</button>
+                            <button type="button" className="btn btn-next" onClick={nextStep}>Siguiente →</button>
                         </div>
                     </div>
                 );
-            
+
             case 3:
                 return (
                     <div className="step-container">
                         <h3 className="step-title">Información Laboral</h3>
+                        {/* Rol */}
                         <div className="form-group">
                             <label htmlFor="rol">Rol</label>
-                            <div className="select-wrapper">
-                                <select
-                                    id="rol"
-                                    name="rol"
-                                    className="form-control"
-                                    value={formData.rol}
-                                    onChange={onChangeHandler}
-                                >   
-                                    <option value="">Seleccione una opcion</option>
-                                    <option value="2">Recepcionista</option>
-                                    <option value="3">Veterinario</option>
-                                </select>
-                            </div>
+                            <select
+                                id="rol"
+                                name="rol"
+                                className="form-control"
+                                value={formData.rol}
+                                onChange={onChangeHandler}
+                            >
+                                <option value="">Seleccione una opcion</option>
+                                <option value="2">Recepcionista</option>
+                                <option value="3">Veterinario</option>
+                            </select>
                         </div>
 
+                        {/* Fecha Contrato */}
                         <div className="form-group">
                             <label htmlFor="fechaContrato">Fecha de Contrato</label>
-                            <div className="input-wrapper date-input">
-                                <input 
-                                    type="date" 
-                                    id="fechaContrato" 
-                                    name="fechaContrato" 
-                                    className="form-control"
-                                    value={formData.fechaContrato}
-                                    onChange={onChangeHandler} 
-                                />
-                            </div>
+                            <input
+                                type="date"
+                                id="fechaContrato"
+                                name="fechaContrato"
+                                className="form-control"
+                                value={formData.fechaContrato}
+                                onChange={onChangeHandler}
+                            />
                         </div>
 
                         <div className="button-group">
-                            <button type="button" className="btn btn-prev" onClick={prevStep}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                                </svg>
-                                Anterior
-                            </button>
-                            <button type="submit" className="btn btn-submit">
-                                Registrarse
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </button>
+                            <button type="button" className="btn btn-prev" onClick={prevStep}>← Anterior</button>
+                            <button type="submit" className="btn btn-submit">Registrarse ✔</button>
                         </div>
                     </div>
                 );
-            
+
             default:
                 return null;
         }
@@ -359,44 +308,40 @@ export function RegisterUserForm() {
 
     return (
         <>
+            <NavigationControls />
+            <div className="register-page">
+                <div className="register-container">
+                    <div className="header">
+                        <img src={logo} alt="guide-upc logo" className="logo" />
+                        <h2>Registro de Personal</h2>
+                    </div>
 
-        <NavigationControls />
-        <div className="register-page">
-            <div className="register-container">
-                <div className="header">
-                    <img
-                        src={logo}
-                        alt="guide-upc logo"
-                        className="logo"
-                    />
-                    <h2>Registro de Personal</h2>
-                </div>
-                
-                <div className="progress-container">
-                    <div className="progress-bar">
-                        <div className={`progress-step ${currentStep >= 1 ? 'active' : ''}`}>
-                            <span className="step-number">1</span>
-                            <span className="step-label">Personal</span>
-                        </div>
-                        <div className="progress-line"></div>
-                        <div className={`progress-step ${currentStep >= 2 ? 'active' : ''}`}>
-                            <span className="step-number">2</span>
-                            <span className="step-label">Contacto</span>
-                        </div>
-                        <div className="progress-line"></div>
-                        <div className={`progress-step ${currentStep >= 3 ? 'active' : ''}`}>
-                            <span className="step-number">3</span>
-                            <span className="step-label">Laboral</span>
+                    <div className="progress-container">
+                        <div className="progress-bar">
+                            <div className={`progress-step ${currentStep >= 1 ? 'active' : ''}`}>
+                                <span className="step-number">1</span>
+                                <span className="step-label">Personal</span>
+                            </div>
+                            <div className="progress-line"></div>
+                            <div className={`progress-step ${currentStep >= 2 ? 'active' : ''}`}>
+                                <span className="step-number">2</span>
+                                <span className="step-label">Contacto</span>
+                            </div>
+                            <div className="progress-line"></div>
+                            <div className={`progress-step ${currentStep >= 3 ? 'active' : ''}`}>
+                                <span className="step-number">3</span>
+                                <span className="step-label">Laboral</span>
+                            </div>
                         </div>
                     </div>
+
+                    <form onSubmit={onSubmitRegister}>
+                        {renderStep()}
+                    </form>
                 </div>
-                
-                <form onSubmit={onSubmitRegister}>
-                    {renderStep()}
-                </form>
             </div>
-        </div>
         </>
     );
 }
+
 export default RegisterUserForm;

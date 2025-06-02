@@ -12,14 +12,14 @@ export default function RecuperarContra() {
 
     useEffect(() => {
         getProfile()
-          .then(data => {
-            setlogin(data.login);
-            console.log("----LOGIN: "+data.login)
-          })
-          .catch(error => {
-            console.error('Error al obtener el perfil del usuario:', error);
-          });
-      }, []);
+            .then(data => {
+                setlogin(data.login);
+                console.log("----LOGIN: " + data.login);
+            })
+            .catch(error => {
+                console.error('Error al obtener el perfil del usuario:', error);
+            });
+    }, []);
 
     const onChangeHandler = (event) => {
         const { name, value } = event.target;
@@ -29,7 +29,20 @@ export default function RecuperarContra() {
 
     const onSubmitCambiarContra = (e) => {
         e.preventDefault();
-        updatePassword(login, oldPass, newPass,navigate);
+
+        // Validaciones
+        if (!oldPass.trim() || !newPass.trim()) {
+            window.alert("Todos los campos son obligatorios.");
+            return;
+        }
+
+        // Ejemplo de validación si esperas que sea solo números (no recomendado para contraseñas)
+        if (/^-?\d+$/.test(newPass) && parseInt(newPass) < 0) {
+            window.alert("La nueva contraseña no puede ser un número negativo.");
+            return;
+        }
+
+        updatePassword(login, oldPass, newPass, navigate);
     };
 
     return (
@@ -39,11 +52,23 @@ export default function RecuperarContra() {
                     <div className="tab-content">
                         <form onSubmit={onSubmitCambiarContra}>
                             <div className="form-outline mb-4">
-                                <input type="password" id="oldPassword" name="oldPass" className="form-control" onChange={onChangeHandler} />
+                                <input
+                                    type="password"
+                                    id="oldPassword"
+                                    name="oldPass"
+                                    className="form-control"
+                                    onChange={onChangeHandler}
+                                />
                                 <label className="form-label" htmlFor="oldPassword">Contraseña Anterior</label>
                             </div>
                             <div className="form-outline mb-4">
-                                <input type="password" id="newPassword" name="newPass" className="form-control" onChange={onChangeHandler} />
+                                <input
+                                    type="password"
+                                    id="newPassword"
+                                    name="newPass"
+                                    className="form-control"
+                                    onChange={onChangeHandler}
+                                />
                                 <label className="form-label" htmlFor="newPassword">Contraseña Nueva</label>
                             </div>
                             <button type="submit" className="btn btn-primary btn-block mb-4">Confirmar</button>

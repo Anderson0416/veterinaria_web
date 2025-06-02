@@ -29,33 +29,57 @@ export function RegisterCliForm() {
         const newErrors = {};
 
         if (type === 'personal') {
-            // ID validation (only numbers)
-            if (!/^\d+$/.test(formData.id)) {
+            if (!formData.id) {
+                newErrors.id = 'El campo ID es obligatorio';
+            } else if (!/^\d+$/.test(formData.id)) {
                 newErrors.id = 'El ID debe contener solo números';
             }
 
-            // Name validation (only letters)
-            if (!/^[A-Za-zÁ-ÿ\s]+$/.test(formData.nombre)) {
+            if (!formData.tipo_id) {
+                newErrors.tipo_id = 'Debe seleccionar un tipo de identificación';
+            }
+
+            if (!formData.nombre) {
+                newErrors.nombre = 'El nombre es obligatorio';
+            } else if (!/^[A-Za-zÁ-ÿ\s]+$/.test(formData.nombre)) {
                 newErrors.nombre = 'El nombre debe contener solo letras';
             }
 
-            // Lastname validation (only letters)
-            if (!/^[A-Za-zÁ-ÿ\s]+$/.test(formData.apellido)) {
+            if (!formData.apellido) {
+                newErrors.apellido = 'El apellido es obligatorio';
+            } else if (!/^[A-Za-zÁ-ÿ\s]+$/.test(formData.apellido)) {
                 newErrors.apellido = 'El apellido debe contener solo letras';
             }
+
+            if (!formData.sexo) {
+                newErrors.sexo = 'Debe seleccionar un sexo';
+            }
+
         } else if (type === 'contacto') {
-            // Phone validation (only numbers)
-            if (!/^\d+$/.test(formData.telefono)) {
+            if (!formData.fechaNacimiento) {
+                newErrors.fechaNacimiento = 'Debe ingresar una fecha de nacimiento';
+            }
+
+            if (!formData.telefono) {
+                newErrors.telefono = 'El teléfono es obligatorio';
+            } else if (!/^\d+$/.test(formData.telefono)) {
                 newErrors.telefono = 'El teléfono debe contener solo números';
             }
 
-            // Email validation
-            if (!validateEmail(formData.email)) {
+            if (!formData.email) {
+                newErrors.email = 'El correo electrónico es obligatorio';
+            } else if (!validateEmail(formData.email)) {
                 newErrors.email = 'Ingrese un correo electrónico válido';
             }
         }
 
         setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            const firstError = Object.values(newErrors)[0];
+            window.alert(firstError);
+        }
+
         return Object.keys(newErrors).length === 0;
     };
 
@@ -89,7 +113,6 @@ export function RegisterCliForm() {
         e.preventDefault();
         if (validateForm('personal') && validateForm('contacto')) {
             try {
-                // Formateamos los datos según el DTO esperado
                 const clienteData = {
                     id: formData.id,
                     tipo_id: formData.tipo_id,
@@ -106,7 +129,6 @@ export function RegisterCliForm() {
                 navigate(-1);
             } catch (error) {
                 console.error('Error al crear cliente:', error);
-                // Aquí podrías manejar los errores específicos si es necesario
                 if (error.response?.data) {
                     console.error('Detalles del error:', error.response.data);
                 }
@@ -236,7 +258,7 @@ export function RegisterCliForm() {
                         </div>
                     </div>
                 );
-            
+
             case 2:
                 return (
                     <div className="step-container">
@@ -248,10 +270,15 @@ export function RegisterCliForm() {
                                     type="date" 
                                     id="fechaNacimiento" 
                                     name="fechaNacimiento" 
-                                    className="form-control"
+                                    className={`form-control ${errors.fechaNacimiento ? 'is-invalid' : ''}`}
                                     value={formData.fechaNacimiento}
                                     onChange={onChangeHandler} 
                                 />
+                                {errors.fechaNacimiento && (
+                                    <div className="invalid-feedback">
+                                        {errors.fechaNacimiento}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -311,7 +338,7 @@ export function RegisterCliForm() {
                         </div>
                     </div>
                 );
-            
+
             default:
                 return null;
         }
@@ -330,7 +357,7 @@ export function RegisterCliForm() {
                     />
                     <h2>Registro de Cliente</h2>
                 </div>
-                
+
                 <div className="progress-container">
                     <div className="progress-bar">
                         <div className={`progress-step ${currentStep >= 1 ? 'active' : ''}`}>
@@ -344,7 +371,7 @@ export function RegisterCliForm() {
                         </div>
                     </div>
                 </div>
-                
+
                 <form onSubmit={onSubmitRegister}>
                     {renderStep()}
                 </form>
